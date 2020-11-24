@@ -9,7 +9,7 @@ output:
     collapsed: false
     number_sections: true
     toc_depth: 3
-    #code_folding: hide
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
@@ -32,8 +32,6 @@ library("writexl")
 bikes_tbl      <- read_excel(path = "data-science/DS_101/00_data/01_bike_sales/01_raw_data/bikes.xlsx")
 orderlines_tbl <- read_excel("data-science/DS_101/00_data/01_bike_sales/01_raw_data/orderlines.xlsx")
 bikeshops_tbl  <- read_excel("data-science/DS_101/00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
-
-left_join(orderlines_tbl, bikes_tbl, by = c("product.id" = "bike.id"))
 
 bike_orderlines_joined_tbl <- orderlines_tbl %>%
   left_join(bikes_tbl, by = c("product.id" = "bike.id")) %>%
@@ -112,7 +110,6 @@ bikes_tbl      <- read_excel(path = "data-science/DS_101/00_data/01_bike_sales/0
 orderlines_tbl <- read_excel("data-science/DS_101/00_data/01_bike_sales/01_raw_data/orderlines.xlsx")
 bikeshops_tbl  <- read_excel("data-science/DS_101/00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
 
-left_join(orderlines_tbl, bikes_tbl, by = c("product.id" = "bike.id"))
 
 bike_orderlines_joined_tbl <- orderlines_tbl %>%
   left_join(bikes_tbl, by = c("product.id" = "bike.id")) %>%

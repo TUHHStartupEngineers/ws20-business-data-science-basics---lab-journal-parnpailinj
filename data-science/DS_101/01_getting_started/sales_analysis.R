@@ -14,33 +14,32 @@ bikeshops_tbl  <- read_excel("data-science/DS_101/00_data/01_bike_sales/01_raw_d
 
 # 3.0 Examining Data ----
 
-# 4.0 Joining Data ----
-left_join(orderlines_tbl, bikes_tbl, by = c("product.id" = "bike.id"))
+# 4.0 Joining Data ---
 
 bike_orderlines_joined_tbl <- orderlines_tbl %>%
   left_join(bikes_tbl, by = c("product.id" = "bike.id")) %>%
   left_join(bikeshops_tbl, by = c("customer.id" = "bikeshop.id"))
 
 # # 5.0 Wrangling Data ----
-# bike_orderlines_wrangled_tbl <- bike_orderlines_joined_tbl %>%
-#   separate(col    = category,
-#            into   = c("category.1", "category.2", "category.3"),
-#            sep    = " - ") %>%
-#   mutate(total.price = price * quantity) %>%
-#   
-#   select(-...1, -gender) %>%
-#  
-#   select(-ends_with(".id")) %>%
-# 
-#   bind_cols(bike_orderlines_joined_tbl %>% select(order.id)) %>% 
-# 
-# 
-#   select(order.id, contains("order"), contains("model"), contains("category"),
-#          price, quantity, total.price,
-#          everything()) %>%
-#   
-#   rename(bikeshop = name) %>%
-#   set_names(names(.) %>% str_replace_all("\\.", "_"))
+bike_orderlines_wrangled_tbl <- bike_orderlines_joined_tbl %>%
+  separate(col    = category,
+           into   = c("category.1", "category.2", "category.3"),
+           sep    = " - ") %>%
+  mutate(total.price = price * quantity) %>%
+
+  select(-...1, -gender) %>%
+
+  select(-ends_with(".id")) %>%
+
+  bind_cols(bike_orderlines_joined_tbl %>% select(order.id)) %>%
+
+
+  select(order.id, contains("order"), contains("model"), contains("category"),
+         price, quantity, total.price,
+         everything()) %>%
+
+  rename(bikeshop = name) %>%
+  set_names(names(.) %>% str_replace_all("\\.", "_"))
 # 
 # # 6.0 Business Insights ----
 # # 6.1 Sales by Year ----
