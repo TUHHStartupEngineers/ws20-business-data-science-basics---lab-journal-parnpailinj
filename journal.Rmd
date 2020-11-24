@@ -18,7 +18,7 @@ knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
 
 
 # Challenge 1
-jvgh
+
 ## Chalenge 1.1
 
 ## Chalenge 1.2
@@ -28,7 +28,7 @@ jvgh
 
 
 
-So, let's say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:
+<!-- So, let's say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this: -->
 
 ```{r}
 samples <- rnorm(100, mean=0, sd=1)
