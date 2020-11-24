@@ -1,5 +1,5 @@
 ---
-title: "Journal (reproducible report)"
+title: "Assignment"
 author: "Parnpailin Jeansathawong"
 date: "2020-11-23"
 output:
@@ -18,22 +18,118 @@ knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
 
 
 # Challenge 1
-
+Last compiled: `r Sys.Date()`
 
 ## Chalenge 1.1
+```{r, fig.width=10, fig.height=7}
+# 1.0 Load libraries ----
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library("writexl")
+
+# 2.0 Importing Files ----
+bikes_tbl      <- read_excel(path = "data-science/DS_101/00_data/01_bike_sales/01_raw_data/bikes.xlsx")
+orderlines_tbl <- read_excel("data-science/DS_101/00_data/01_bike_sales/01_raw_data/orderlines.xlsx")
+bikeshops_tbl  <- read_excel("data-science/DS_101/00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
+
+#Challenge 1
+
+bike_orderlines_wrangled_city_state_tbl <- bike_orderlines_wrangled_tbl %>%
+  separate(col    = location,
+           into   = c("city", "state"),
+           sep    = ",") 
+
+sales_by_city_state_tbl <- bike_orderlines_wrangled_city_state_tbl %>%
+  select(order_date, state, city, total_price) %>%
+  mutate(year = year(order_date)) %>%
+  group_by(state, city) %>%
+  summarise(sales = sum(total_price)) %>%
+  ungroup() %>%
+  
+  # Format $ Text
+  mutate(sales_text = scales::dollar(sales, big.mark = ".", 
+                                     decimal.mark = ",", 
+                                     prefix = "", 
+                                     suffix = " €"))  
+
+sales_by_city_state_tbl %>%
+  ggplot(aes(x = state, y = sales)) +
+  geom_col(fill = "#2DC6D6") + # Use geom_col for a bar plot
+  
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  scale_y_continuous(labels = scales::dollar_format(big.mark = ".", 
+                                                    decimal.mark = ",", 
+                                                    prefix = "", 
+                                                    suffix = " €")) +
+  labs(
+    title    = "Revenue by state",
+    subtitle = "",
+    x = "State", # Override defaults for x and y
+    y = "Revenue"
+  )
+```
+
 
 ## Chalenge 1.2
+
+```{r, fig.width=10, fig.height=7}
+# 1.0 Load libraries ----
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library("writexl")
+
+# 2.0 Importing Files ----
+bikes_tbl      <- read_excel(path = "data-science/DS_101/00_data/01_bike_sales/01_raw_data/bikes.xlsx")
+orderlines_tbl <- read_excel("data-science/DS_101/00_data/01_bike_sales/01_raw_data/orderlines.xlsx")
+bikeshops_tbl  <- read_excel("data-science/DS_101/00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
+
+sales_by_location_year_tbl <- bike_orderlines_wrangled_city_state_tbl %>%
+  select(order_date, state, city, total_price) %>%
+  mutate(year = year(order_date)) %>%
+  group_by(state, year) %>%
+  summarise(sales = sum(total_price)) %>%
+  ungroup() %>%
+  
+  # Format $ Text
+  mutate(sales_text = scales::dollar(sales, big.mark = ".", 
+                                     decimal.mark = ",", 
+                                     prefix = "", 
+                                     suffix = " €"))  
+# Step 2 - Visualize
+sales_by_location_year_tbl %>%
+  
+  ggplot(aes(x = year, y = sales, fill = state)) +
+  geom_col() + # Run up to here to get a stacked bar plot
+  
+  facet_wrap(~ state) +
+  
+  scale_y_continuous(labels = scales::dollar_format(big.mark = ".", 
+                                                    decimal.mark = ",", 
+                                                    prefix = "", 
+                                                    suffix = " €")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  
+  labs(
+    title = "Revenue by year and state",
+    subtitle = "",
+    fill = "State" # Changes the legend name
+  )
+
+
+
+```
+
 # Challenge 2
+```{r, fig.width=10, fig.height=7}
+
+
+```
 
 # Challenge 3
 
+```{r, fig.width=10, fig.height=7}
 
-
-<!-- So, let's say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this: -->
-
-```{r}
-samples <- rnorm(100, mean=0, sd=1)
-hist(samples)
 ```
 
-<!-- When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You'll learn that all of these things and more can be customized in each R code block. -->
