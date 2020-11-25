@@ -173,11 +173,102 @@ sales_by_location_year_tbl %>%
 ```
 
 # Challenge 2
+## Chalenge 2.1
+R Flights 
+- Get 10 cheapest flights from Germany to Bangkok from 1 Feb 2021 to 15 Feb 2021
+- Get 10 cheapest fligths from Germany to anywhere today for 2 weeks
 ```{r, fig.width=10, fig.height=7}
+library("rflights")
 
+# get Germany and Bangkok IDs
+arg_id <- find_location("Germany", "country")
+length(arg_id) # only one result, so it might be the one
+
+arg_id <- arg_id[[1]]
+# names(arg_id)
+
+arg_id$id
+
+# arg_id$continent
+# arg_id <- arg_id$id
+
+tl_id <- find_location("bangkok")
+length(tl_id)
+
+# lapply(tl_id, function(x) x$type)
+
+# we are looking for the city
+tl_id <- tl_id[[which(sapply(tl_id, function(x) x$type == "city"))]]
+tl_id$country
+
+tl_id <- tl_id$id
+tl_id
+
+# get flights from Germany to Bangkok
+flights <- get_flights(
+  fly_from = "DE", fly_to = "bangkok_th",
+  date_from = "01/02/2021", date_to = "15/02/2021"
+)
+length(flights)
+# names(flights[[1]])
+head(t(sapply(flights, function(x) c(x$price, x$cityTo))), n = 10)
+
+
+# Let's go anywhere!
+flights <- get_flights(
+  fly_from = "DE",
+  date_from = Sys.Date(), date_to = Sys.Date() + 2 * 7
+)
+length(flights)
+head(t(sapply(flights, function(x) c(x$price, x$cityTo))), n = 10)
 
 ```
 
+## Chalenge 2.2
+```{r, fig.width=10, fig.height=7}
+library(tidyverse) # Main Package - Loads dplyr, purrr, etc.
+library(rvest)     # HTML Hacking & Web Scraping
+library(xopen)     # Quickly opening URLs
+library(jsonlite)  # converts JSON files to R objects
+library(glue)      # concatenate strings
+library(stringi)   # character string/text processing
+
+library(tidyverse) # Main Package - Loads dplyr, purrr, etc.
+library(rvest)     # HTML Hacking & Web Scraping
+library(xopen)     # Quickly opening URLs
+library(jsonlite)  # converts JSON files to R objects
+library(glue)      # concatenate strings
+library(stringi)   # character string/text processing
+
+
+# url_mtb <- "https://www.rosebikes.de/fahrr%C3%A4der/mtb"
+# 
+# xopen(url_mtb)
+
+html_mtb <- read_html("https://www.rosebikes.de/fahrr%C3%A4der/mtb")
+
+bike_tbl <- html_mtb %>%
+  html_nodes(css = ".catalog-category-bikes__title-text") %>%
+  html_text() %>% 
+  stringr::str_replace_all(pattern = "\n", replacement = "") %>% 
+  enframe(name = "position", value = "bike")
+
+
+price_tbl <- html_mtb %>%
+  html_nodes(css = ".catalog-category-bikes__price-title") %>%
+  html_text() %>%
+  stringr::str_replace_all(pattern = "\nab ", replacement = "") %>%
+  stringr::str_replace_all(pattern = "\n", replacement = "") %>%
+  stringr::str_replace_all(pattern = "\200", replacement = "") %>%
+  stringr::str_replace_all(pattern = ",00", replacement = "") %>%
+  str_remove_all(pattern = "\\.")  %>%
+  readr::parse_number() %>%
+  enframe(name = "position", value = "price")
+
+left_join(bike_tbl,price_tbl)
+
+
+```
 # Challenge 3
 
 ```{r, fig.width=10, fig.height=7}

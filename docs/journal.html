@@ -424,7 +424,7 @@ div.tocify {
 
 <div id="challenge-1" class="section level1">
 <h1><span class="header-section-number">1</span> Challenge 1</h1>
-<p>Last compiled: 2020-11-24</p>
+<p>Last compiled: 2020-11-25</p>
 <div id="chalenge-1.1" class="section level2">
 <h2><span class="header-section-number">1.1</span> Chalenge 1.1</h2>
 <pre class="r"><code># 1.0 Load libraries ----
@@ -575,6 +575,140 @@ sales_by_location_year_tbl %&gt;%
 </div>
 <div id="challenge-2" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 2</h1>
+<div id="chalenge-2.1" class="section level2">
+<h2><span class="header-section-number">2.1</span> Chalenge 2.1</h2>
+<p>R Flights - Get 10 cheapest flights from Germany to Bangkok from 1 Feb 2021 to 15 Feb 2021 - Get 10 cheapest fligths from Germany to anywhere today for 2 weeks</p>
+<pre class="r"><code>library(&quot;rflights&quot;)
+
+# get Germany and Bangkok IDs
+arg_id &lt;- find_location(&quot;Germany&quot;, &quot;country&quot;)
+length(arg_id) # only one result, so it might be the one</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>arg_id &lt;- arg_id[[1]]
+# names(arg_id)
+
+arg_id$id</code></pre>
+<pre><code>## [1] &quot;DE&quot;</code></pre>
+<pre class="r"><code># arg_id$continent
+# arg_id &lt;- arg_id$id
+
+tl_id &lt;- find_location(&quot;bangkok&quot;)
+length(tl_id)</code></pre>
+<pre><code>## [1] 9</code></pre>
+<pre class="r"><code># lapply(tl_id, function(x) x$type)
+
+# we are looking for the city
+tl_id &lt;- tl_id[[which(sapply(tl_id, function(x) x$type == &quot;city&quot;))]]
+tl_id$country</code></pre>
+<pre><code>## $id
+## [1] &quot;TH&quot;
+## 
+## $name
+## [1] &quot;Thailand&quot;
+## 
+## $slug
+## [1] &quot;thailand&quot;
+## 
+## $code
+## [1] &quot;TH&quot;</code></pre>
+<pre class="r"><code>tl_id &lt;- tl_id$id
+tl_id</code></pre>
+<pre><code>## [1] &quot;bangkok_th&quot;</code></pre>
+<pre class="r"><code># get flights from Germany to Bangkok
+flights &lt;- get_flights(
+  fly_from = &quot;DE&quot;, fly_to = &quot;bangkok_th&quot;,
+  date_from = &quot;01/02/2021&quot;, date_to = &quot;15/02/2021&quot;
+)
+length(flights)</code></pre>
+<pre><code>## [1] 240</code></pre>
+<pre class="r"><code># names(flights[[1]])
+head(t(sapply(flights, function(x) c(x$price, x$cityTo))), n = 10)</code></pre>
+<pre><code>##       [,1]  [,2]     
+##  [1,] &quot;302&quot; &quot;Bangkok&quot;
+##  [2,] &quot;309&quot; &quot;Bangkok&quot;
+##  [3,] &quot;309&quot; &quot;Bangkok&quot;
+##  [4,] &quot;316&quot; &quot;Bangkok&quot;
+##  [5,] &quot;317&quot; &quot;Bangkok&quot;
+##  [6,] &quot;317&quot; &quot;Bangkok&quot;
+##  [7,] &quot;317&quot; &quot;Bangkok&quot;
+##  [8,] &quot;317&quot; &quot;Bangkok&quot;
+##  [9,] &quot;320&quot; &quot;Bangkok&quot;
+## [10,] &quot;323&quot; &quot;Bangkok&quot;</code></pre>
+<pre class="r"><code># Let&#39;s go anywhere!
+flights &lt;- get_flights(
+  fly_from = &quot;DE&quot;,
+  date_from = Sys.Date(), date_to = Sys.Date() + 2 * 7
+)
+length(flights)</code></pre>
+<pre><code>## [1] 240</code></pre>
+<pre class="r"><code>head(t(sapply(flights, function(x) c(x$price, x$cityTo))), n = 10)</code></pre>
+<pre><code>##       [,1] [,2]       
+##  [1,] &quot;14&quot; &quot;Lisbon&quot;   
+##  [2,] &quot;17&quot; &quot;London&quot;   
+##  [3,] &quot;18&quot; &quot;Athens&quot;   
+##  [4,] &quot;22&quot; &quot;Barcelona&quot;
+##  [5,] &quot;21&quot; &quot;Athens&quot;   
+##  [6,] &quot;28&quot; &quot;London&quot;   
+##  [7,] &quot;28&quot; &quot;Athens&quot;   
+##  [8,] &quot;28&quot; &quot;Athens&quot;   
+##  [9,] &quot;28&quot; &quot;Athens&quot;   
+## [10,] &quot;28&quot; &quot;Athens&quot;</code></pre>
+</div>
+<div id="chalenge-2.2" class="section level2">
+<h2><span class="header-section-number">2.2</span> Chalenge 2.2</h2>
+<pre class="r"><code>library(tidyverse) # Main Package - Loads dplyr, purrr, etc.
+library(rvest)     # HTML Hacking &amp; Web Scraping
+library(xopen)     # Quickly opening URLs
+library(jsonlite)  # converts JSON files to R objects
+library(glue)      # concatenate strings
+library(stringi)   # character string/text processing
+
+library(tidyverse) # Main Package - Loads dplyr, purrr, etc.
+library(rvest)     # HTML Hacking &amp; Web Scraping
+library(xopen)     # Quickly opening URLs
+library(jsonlite)  # converts JSON files to R objects
+library(glue)      # concatenate strings
+library(stringi)   # character string/text processing
+
+
+# url_mtb &lt;- &quot;https://www.rosebikes.de/fahrr%C3%A4der/mtb&quot;
+# 
+# xopen(url_mtb)
+
+html_mtb &lt;- read_html(&quot;https://www.rosebikes.de/fahrr%C3%A4der/mtb&quot;)
+
+bike_tbl &lt;- html_mtb %&gt;%
+  html_nodes(css = &quot;.catalog-category-bikes__title-text&quot;) %&gt;%
+  html_text() %&gt;% 
+  stringr::str_replace_all(pattern = &quot;\n&quot;, replacement = &quot;&quot;) %&gt;% 
+  enframe(name = &quot;position&quot;, value = &quot;bike&quot;)
+
+
+price_tbl &lt;- html_mtb %&gt;%
+  html_nodes(css = &quot;.catalog-category-bikes__price-title&quot;) %&gt;%
+  html_text() %&gt;%
+  stringr::str_replace_all(pattern = &quot;\nab &quot;, replacement = &quot;&quot;) %&gt;%
+  stringr::str_replace_all(pattern = &quot;\n&quot;, replacement = &quot;&quot;) %&gt;%
+  stringr::str_replace_all(pattern = &quot;\200&quot;, replacement = &quot;&quot;) %&gt;%
+  stringr::str_replace_all(pattern = &quot;,00&quot;, replacement = &quot;&quot;) %&gt;%
+  str_remove_all(pattern = &quot;\\.&quot;)  %&gt;%
+  readr::parse_number() %&gt;%
+  enframe(name = &quot;position&quot;, value = &quot;price&quot;)
+
+left_join(bike_tbl,price_tbl)</code></pre>
+<pre><code>## # A tibble: 9 x 3
+##   position bike              price
+##      &lt;int&gt; &lt;chr&gt;             &lt;dbl&gt;
+## 1        1 GROUND CONTROL     1699
+## 2        2 ROOT MILLER        1999
+## 3        3 PIKES PEAK         3099
+## 4        4 THE BRUCE            NA
+## 5        5 COUNT SOLO           NA
+## 6        6 PSYCHO PATH        1849
+## 7        7 THRILL HILL        2599
+## 8        8 THRILL HILL TRAIL  2899
+## 9        9 SOUL FIRE          2149</code></pre>
+</div>
 </div>
 <div id="challenge-3" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 3</h1>
