@@ -35,22 +35,28 @@ patent_assignee_tbl <- vroom(
   na         = c("", "NA", "NULL")
 )
 
-
 col_types <- list(
-  uuid = col_character(),
-  patent_id = col_character(),
-  mainclass_id = col_character(),
-  subclass_id = col_character(),
-  sequence = col_double()
+  id = col_character(),
+  type = col_character(),
+  number = col_character(),
+  country = col_character(),
+  date = col_date("%Y-%m-%d"),
+  abstract = col_character(),
+  title = col_character(),
+  kind = col_character(),
+  num_claims = col_double(),
+  filename = col_character(),
+  withdrawn = col_double()
 )
 
-uspc_tbl <- vroom(
-  file       = "data-science/DS_101/00_data/uspc.tsv",
+patent_tbl <- vroom(
+  file       = "data-science/DS_101/00_data/patent.tsv",
   delim      = "\t",
   col_names  = names(col_types),
   col_types  = col_types,
   na         = c("", "NA", "NULL")
 )
+
 
 
 assignee_select_tbl <- assignee_tbl %>%
@@ -62,14 +68,25 @@ assignee_select_tbl <- assignee_tbl %>%
 patent_assignee_select_tbl <- patent_assignee_tbl %>%
   select(patent_id,assignee_id)
 
-
-uspc_select_tbl <- uspc_tbl %>%
-  select(patent_id, mainclass_id) 
+patent_select_tbl <- patent_tbl %>%
+  select(number, date) %>%
+  rename(
+    patent_id = number
+  )
 
 
 patent_assignee_joined_tbl <- assignee_select_tbl %>%
   left_join(y = patent_assignee_select_tbl, by = c("assignee_id" = "assignee_id")) %>%
-  select(type,organization,patent_id) %>%
+  left_join(y = patent_select_tbl, by = c("patent_id" = "patent_id")) %>%
+  select(type,date,organization,patent_id) %>%
+  filter(type == 2) %>%
+  separate(col  = date,
+           into = c("year", "month", "date"),
+           sep  = "-", remove = FALSE) %>%
+  mutate(
+    year  = as.numeric(year)
+  ) %>%
+  filter(year == 2019) %>%
   group_by(organization) %>%
   summarise(
     count = n()
@@ -77,20 +94,5 @@ patent_assignee_joined_tbl <- assignee_select_tbl %>%
   ungroup() %>%
   arrange(desc(count)) %>%
   slice(1:10)
+
 patent_assignee_joined_tbl
-# get the list of top10 result and put to filter below
-
-top_mainclass_tbl <- assignee_select_tbl %>%
-  left_join(y = patent_assignee_select_tbl, by = c("assignee_id" = "assignee_id")) %>%
-  left_join(y = uspc_select_tbl, by = c("patent_id" = "patent_id")) %>%
-  select(organization,mainclass_id) %>%
-  filter(organization %in% c("International Business Machines Corporation", "Canon Kabushiki Kaisha","Samsung Electronics Co., Ltd.","General Electric Company","Kabushiki Kaisha Toshiba","Sony Corporation","Hitachi, Ltd.","Intel Corporation","Fujitsu Limited","NEC Corporation")) %>%
-  group_by(mainclass_id) %>%
-  summarise(
-    count = n()
-  ) %>%
-  arrange(desc(count)) %>%
-  ungroup() %>%
-  slice(1:6) #row 1 is NA
-
-top_mainclass_tbl

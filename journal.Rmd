@@ -13,7 +13,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
+knitr::opts_chunk$set(cache = TRUE, warning = FALSE, message = FALSE, cache.lazy = FALSE)
 ```
 
 
@@ -273,6 +273,7 @@ left_join(bike_tbl,price_tbl)
 # Challenge 3
 ## Challenge 3.1
 ```{r, fig.width=10, fig.height=7}
+
 library(tidyverse)
 library(vroom)
 library(tidyverse)
@@ -338,6 +339,7 @@ patent_assignee_joined_tbl
 ```
 ## Challenge 3.2
 ```{r, fig.width=10, fig.height=7}
+
 library(tidyverse)
 library(vroom)
 library(tidyverse)
@@ -440,6 +442,7 @@ patent_assignee_joined_tbl
 ```
 ## Challenge 3.3
 ```{r, fig.width=10, fig.height=7}
+
 library(tidyverse)
 library(vroom)
 library(tidyverse)
