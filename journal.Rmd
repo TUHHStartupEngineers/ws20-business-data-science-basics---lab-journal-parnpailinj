@@ -272,7 +272,7 @@ left_join(bike_tbl,price_tbl)
 ```
 # Challenge 3
 ## Challenge 3.1
-```{r, fig.width=10, fig.height=7}
+```{r caluclation, eval=FALSE}
 
 library(tidyverse)
 library(vroom)
@@ -336,9 +336,17 @@ patent_assignee_joined_tbl <- assignee_select_tbl %>%
   slice(1:10)
 
 patent_assignee_joined_tbl
+
+```
+
+```{r result}
+library(readr)
+library(data.table)
+result <- read_rds("assignment3-1.rds")
+result
 ```
 ## Challenge 3.2
-```{r, fig.width=10, fig.height=7}
+```{r caluclation, eval=FALSE}
 
 library(tidyverse)
 library(vroom)
@@ -440,8 +448,17 @@ patent_assignee_joined_tbl <- assignee_select_tbl %>%
 patent_assignee_joined_tbl
 
 ```
+
+```{r result}
+library(readr)
+library(data.table)
+result <- read_rds("assignment3-2.rds")
+result
+```
+
+
 ## Challenge 3.3
-```{r, fig.width=10, fig.height=7}
+```{r caluclation, eval=FALSE}
 
 library(tidyverse)
 library(vroom)
@@ -540,6 +557,13 @@ top_mainclass_tbl <- assignee_select_tbl %>%
 
 top_mainclass_tbl
 
+```
+
+```{r result}
+library(readr)
+library(data.table)
+result <- read_rds("assignment3-3.rds")
+result
 ```
 # Challenge 4
 

@@ -94,3 +94,5 @@ top_mainclass_tbl <- assignee_select_tbl %>%
   slice(1:6) #row 1 is NA
 
 top_mainclass_tbl
+
+write_rds(top_mainclass_tbl,"assignment3-3.rds")

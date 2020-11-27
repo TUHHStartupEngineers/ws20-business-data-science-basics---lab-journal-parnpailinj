@@ -76,4 +76,5 @@ patent_assignee_joined_tbl <- assignee_select_tbl %>%
   arrange(desc(count)) %>%
   slice(1:10)
 
-patent_assignee_joined_tbl
+
+write_rds(patent_assignee_joined_tbl,"assignment3-2.rds")
