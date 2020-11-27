@@ -424,7 +424,7 @@ div.tocify {
 
 <div id="challenge-1" class="section level1">
 <h1><span class="header-section-number">1</span> Challenge 1</h1>
-<p>Last compiled: 2020-11-25</p>
+<p>Last compiled: 2020-11-27</p>
 <div id="chalenge-1.1" class="section level2">
 <h2><span class="header-section-number">1.1</span> Chalenge 1.1</h2>
 <pre class="r"><code># 1.0 Load libraries ----
@@ -625,34 +625,34 @@ length(flights)</code></pre>
 head(t(sapply(flights, function(x) c(x$price, x$cityTo))), n = 10)</code></pre>
 <pre><code>##       [,1]  [,2]     
 ##  [1,] &quot;302&quot; &quot;Bangkok&quot;
-##  [2,] &quot;309&quot; &quot;Bangkok&quot;
+##  [2,] &quot;306&quot; &quot;Bangkok&quot;
 ##  [3,] &quot;309&quot; &quot;Bangkok&quot;
 ##  [4,] &quot;316&quot; &quot;Bangkok&quot;
-##  [5,] &quot;317&quot; &quot;Bangkok&quot;
-##  [6,] &quot;317&quot; &quot;Bangkok&quot;
+##  [5,] &quot;316&quot; &quot;Bangkok&quot;
+##  [6,] &quot;316&quot; &quot;Bangkok&quot;
 ##  [7,] &quot;317&quot; &quot;Bangkok&quot;
 ##  [8,] &quot;317&quot; &quot;Bangkok&quot;
-##  [9,] &quot;320&quot; &quot;Bangkok&quot;
-## [10,] &quot;323&quot; &quot;Bangkok&quot;</code></pre>
+##  [9,] &quot;317&quot; &quot;Bangkok&quot;
+## [10,] &quot;317&quot; &quot;Bangkok&quot;</code></pre>
 <pre class="r"><code># Let&#39;s go anywhere!
 flights &lt;- get_flights(
   fly_from = &quot;DE&quot;,
   date_from = Sys.Date(), date_to = Sys.Date() + 2 * 7
 )
 length(flights)</code></pre>
-<pre><code>## [1] 240</code></pre>
+<pre><code>## [1] 239</code></pre>
 <pre class="r"><code>head(t(sapply(flights, function(x) c(x$price, x$cityTo))), n = 10)</code></pre>
-<pre><code>##       [,1] [,2]       
-##  [1,] &quot;14&quot; &quot;Lisbon&quot;   
-##  [2,] &quot;17&quot; &quot;London&quot;   
-##  [3,] &quot;18&quot; &quot;Athens&quot;   
-##  [4,] &quot;22&quot; &quot;Barcelona&quot;
-##  [5,] &quot;21&quot; &quot;Athens&quot;   
-##  [6,] &quot;28&quot; &quot;London&quot;   
-##  [7,] &quot;28&quot; &quot;Athens&quot;   
-##  [8,] &quot;28&quot; &quot;Athens&quot;   
-##  [9,] &quot;28&quot; &quot;Athens&quot;   
-## [10,] &quot;28&quot; &quot;Athens&quot;</code></pre>
+<pre><code>##       [,1] [,2]    
+##  [1,] &quot;28&quot; &quot;London&quot;
+##  [2,] &quot;35&quot; &quot;London&quot;
+##  [3,] &quot;36&quot; &quot;Athens&quot;
+##  [4,] &quot;36&quot; &quot;Athens&quot;
+##  [5,] &quot;36&quot; &quot;Athens&quot;
+##  [6,] &quot;36&quot; &quot;Athens&quot;
+##  [7,] &quot;36&quot; &quot;Athens&quot;
+##  [8,] &quot;35&quot; &quot;Lisbon&quot;
+##  [9,] &quot;36&quot; &quot;Athens&quot;
+## [10,] &quot;37&quot; &quot;London&quot;</code></pre>
 </div>
 <div id="chalenge-2.2" class="section level2">
 <h2><span class="header-section-number">2.2</span> Chalenge 2.2</h2>
@@ -713,6 +713,300 @@ left_join(bike_tbl,price_tbl)</code></pre>
 </div>
 <div id="challenge-3" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 3</h1>
+<div id="challenge-3.1" class="section level2">
+<h2><span class="header-section-number">3.1</span> Challenge 3.1</h2>
+<pre class="r"><code>library(tidyverse)
+library(vroom)
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(&quot;writexl&quot;)
+
+col_types &lt;- list(
+  id = col_character(),
+  type = col_double(),
+  name_first = col_character(),
+  name_last = col_character(),
+  organization = col_character()
+)
+
+assignee_tbl &lt;- vroom(
+  file       = &quot;data-science/DS_101/00_data/assignee.tsv&quot;,
+  delim      = &quot;\t&quot;,
+  col_names  = names(col_types),
+  col_types  = col_types,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+col_types &lt;- list(
+  patent_id = col_character(),
+  assignee_id = col_character(),
+  location_id = col_character()
+)
+
+patent_assignee_tbl &lt;- vroom(
+  file       = &quot;data-science/DS_101/00_data/patent_assignee.tsv&quot;,
+  delim      = &quot;\t&quot;,
+  col_names  = names(col_types),
+  col_types  = col_types,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+
+
+assignee_select_tbl &lt;- assignee_tbl %&gt;%
+  select(id, type, organization) %&gt;%
+  rename(
+    assignee_id = id
+  )
+
+patent_select_tbl &lt;- patent_assignee_tbl %&gt;%
+  select(patent_id,assignee_id)
+
+
+patent_assignee_joined_tbl &lt;- assignee_select_tbl %&gt;%
+  left_join(y = patent_select_tbl, by = c(&quot;assignee_id&quot; = &quot;assignee_id&quot;)) %&gt;%
+  select(type,organization,patent_id) %&gt;%
+  filter(type == 2) %&gt;%
+  group_by(organization) %&gt;%
+  summarise(
+    count = n()
+  ) %&gt;%
+  ungroup() %&gt;%
+  arrange(desc(count)) %&gt;%
+  slice(1:10)
+
+patent_assignee_joined_tbl</code></pre>
+<pre class="r"><code>library(readr)
+library(data.table)
+result1 &lt;- read_rds(&quot;assignment3-1.rds&quot;)
+result1</code></pre>
+<pre><code>## # A tibble: 10 x 2
+##    organization                                 count
+##    &lt;chr&gt;                                        &lt;int&gt;
+##  1 International Business Machines Corporation 139092
+##  2 General Electric Company                     47122
+##  3 Intel Corporation                            42157
+##  4 Hewlett-Packard Development Company, L.P.    35573
+##  5 Microsoft Corporation                        30086
+##  6 Micron Technology, Inc.                      28001
+##  7 QUALCOMM Incorporated                        24703
+##  8 Texas Instruments Incorporated               24182
+##  9 Xerox Corporation                            23174
+## 10 Apple Inc.                                   21821</code></pre>
+</div>
+<div id="challenge-3.2" class="section level2">
+<h2><span class="header-section-number">3.2</span> Challenge 3.2</h2>
+<pre class="r2"><code>
+library(tidyverse)
+library(vroom)
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(&quot;writexl&quot;)
+
+col_types &lt;- list(
+  id = col_character(),
+  type = col_double(),
+  name_first = col_character(),
+  name_last = col_character(),
+  organization = col_character()
+)
+
+assignee_tbl2 &lt;- vroom(
+  file       = &quot;data-science/DS_101/00_data/assignee.tsv&quot;,
+  delim      = &quot;\t&quot;,
+  col_names  = names(col_types),
+  col_types  = col_types,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+col_types &lt;- list(
+  patent_id = col_character(),
+  assignee_id = col_character(),
+  location_id = col_character()
+)
+
+patent_assignee_tbl2 &lt;- vroom(
+  file       = &quot;data-science/DS_101/00_data/patent_assignee.tsv&quot;,
+  delim      = &quot;\t&quot;,
+  col_names  = names(col_types),
+  col_types  = col_types,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+col_types &lt;- list(
+  id = col_character(),
+  type = col_character(),
+  number = col_character(),
+  country = col_character(),
+  date = col_date(&quot;%Y-%m-%d&quot;),
+  abstract = col_character(),
+  title = col_character(),
+  kind = col_character(),
+  num_claims = col_double(),
+  filename = col_character(),
+  withdrawn = col_double()
+)
+
+patent_tbl2 &lt;- vroom(
+  file       = &quot;data-science/DS_101/00_data/patent.tsv&quot;,
+  delim      = &quot;\t&quot;,
+  col_names  = names(col_types),
+  col_types  = col_types,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+
+
+assignee_select_tbl2 &lt;- assignee_tbl2 %&gt;%
+  select(id, type, organization) %&gt;%
+  rename(
+    assignee_id = id
+  )
+
+patent_assignee_select_tbl2 &lt;- patent_assignee_tbl2 %&gt;%
+  select(patent_id,assignee_id)
+
+patent_select_tbl2 &lt;- patent_tbl2 %&gt;%
+  select(number, date) %&gt;%
+  rename(
+    patent_id = number
+  )
+
+
+patent_assignee_joined_tbl2 &lt;- assignee_select_tbl2 %&gt;%
+  left_join(y = patent_assignee_select_tbl2, by = c(&quot;assignee_id&quot; = &quot;assignee_id&quot;)) %&gt;%
+  left_join(y = patent_select_tbl2, by = c(&quot;patent_id&quot; = &quot;patent_id&quot;)) %&gt;%
+  select(type,date,organization,patent_id) %&gt;%
+  filter(type == 2) %&gt;%
+  separate(col  = date,
+           into = c(&quot;year&quot;, &quot;month&quot;, &quot;date&quot;),
+           sep  = &quot;-&quot;, remove = FALSE) %&gt;%
+  mutate(
+    year  = as.numeric(year)
+  ) %&gt;%
+  filter(year == 2019) %&gt;%
+  group_by(organization) %&gt;%
+  summarise(
+    count = n()
+  ) %&gt;%
+  ungroup() %&gt;%
+  arrange(desc(count)) %&gt;%
+  slice(1:10)
+
+patent_assignee_joined_tbl2
+</code></pre>
+<pre class="r2"><code>library(readr)
+library(data.table)
+result2 &lt;- read_rds(&quot;assignment3-2.rds&quot;)
+result2</code></pre>
+</div>
+<div id="challenge-3.3" class="section level2">
+<h2><span class="header-section-number">3.3</span> Challenge 3.3</h2>
+<pre class="r3"><code>
+library(tidyverse)
+library(vroom)
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(&quot;writexl&quot;)
+
+col_types &lt;- list(
+  id = col_character(),
+  type = col_double(),
+  name_first = col_character(),
+  name_last = col_character(),
+  organization = col_character()
+)
+
+assignee_tbl3 &lt;- vroom(
+  file       = &quot;data-science/DS_101/00_data/assignee.tsv&quot;,
+  delim      = &quot;\t&quot;,
+  col_names  = names(col_types),
+  col_types  = col_types,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+col_types &lt;- list(
+  patent_id = col_character(),
+  assignee_id = col_character(),
+  location_id = col_character()
+)
+
+patent_assignee_tbl3 &lt;- vroom(
+  file       = &quot;data-science/DS_101/00_data/patent_assignee.tsv&quot;,
+  delim      = &quot;\t&quot;,
+  col_names  = names(col_types),
+  col_types  = col_types,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+
+col_types &lt;- list(
+  uuid = col_character(),
+  patent_id = col_character(),
+  mainclass_id = col_character(),
+  subclass_id = col_character(),
+  sequence = col_double()
+)
+
+uspc_tbl3 &lt;- vroom(
+  file       = &quot;data-science/DS_101/00_data/uspc.tsv&quot;,
+  delim      = &quot;\t&quot;,
+  col_names  = names(col_types),
+  col_types  = col_types,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+
+assignee_select_tbl3 &lt;- assignee_tbl3 %&gt;%
+  select(id, type, organization) %&gt;%
+  rename(
+    assignee_id = id
+  )
+
+patent_assignee_select_tbl3 &lt;- patent_assignee_tbl3 %&gt;%
+  select(patent_id,assignee_id)
+
+
+uspc_select_tbl3 &lt;- uspc_tbl3 %&gt;%
+  select(patent_id, mainclass_id) 
+
+
+patent_assignee_joined_tbl3 &lt;- assignee_select_tbl3 %&gt;%
+  left_join(y = patent_assignee_select_tbl3, by = c(&quot;assignee_id&quot; = &quot;assignee_id&quot;)) %&gt;%
+  select(type,organization,patent_id) %&gt;%
+  group_by(organization) %&gt;%
+  summarise(
+    count = n()
+  ) %&gt;%
+  ungroup() %&gt;%
+  arrange(desc(count)) %&gt;%
+  slice(1:10)
+patent_assignee_joined_tbl3
+# get the list of top10 result and put to filter below
+
+top_mainclass_tbl3 &lt;- assignee_select_tbl3 %&gt;%
+  left_join(y = patent_assignee_select_tbl3, by = c(&quot;assignee_id&quot; = &quot;assignee_id&quot;)) %&gt;%
+  left_join(y = uspc_select_tbl3, by = c(&quot;patent_id&quot; = &quot;patent_id&quot;)) %&gt;%
+  select(organization,mainclass_id) %&gt;%
+  filter(organization %in% c(&quot;International Business Machines Corporation&quot;, &quot;Canon Kabushiki Kaisha&quot;,&quot;Samsung Electronics Co., Ltd.&quot;,&quot;General Electric Company&quot;,&quot;Kabushiki Kaisha Toshiba&quot;,&quot;Sony Corporation&quot;,&quot;Hitachi, Ltd.&quot;,&quot;Intel Corporation&quot;,&quot;Fujitsu Limited&quot;,&quot;NEC Corporation&quot;)) %&gt;%
+  group_by(mainclass_id) %&gt;%
+  summarise(
+    count = n()
+  ) %&gt;%
+  arrange(desc(count)) %&gt;%
+  ungroup() %&gt;%
+  slice(1:6) #row 1 is NA
+
+top_mainclass_tbl3
+</code></pre>
+<pre class="r3"><code>library(readr)
+library(data.table)
+result3 &lt;- read_rds(&quot;assignment3-3.rds&quot;)
+result3</code></pre>
+</div>
 </div>
 <div id="challenge-4" class="section level1">
 <h1><span class="header-section-number">4</span> Challenge 4</h1>

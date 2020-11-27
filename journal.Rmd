@@ -339,14 +339,14 @@ patent_assignee_joined_tbl
 
 ```
 
-```{r result}
+```{r result1}
 library(readr)
 library(data.table)
-result <- read_rds("assignment3-1.rds")
-result
+result1 <- read_rds("assignment3-1.rds")
+result1
 ```
 ## Challenge 3.2
-```{r caluclation, eval=FALSE}
+```{r2 caluclation2, eval=FALSE}
 
 library(tidyverse)
 library(vroom)
@@ -363,7 +363,7 @@ col_types <- list(
   organization = col_character()
 )
 
-assignee_tbl <- vroom(
+assignee_tbl2 <- vroom(
   file       = "data-science/DS_101/00_data/assignee.tsv",
   delim      = "\t",
   col_names  = names(col_types),
@@ -377,7 +377,7 @@ col_types <- list(
   location_id = col_character()
 )
 
-patent_assignee_tbl <- vroom(
+patent_assignee_tbl2 <- vroom(
   file       = "data-science/DS_101/00_data/patent_assignee.tsv",
   delim      = "\t",
   col_names  = names(col_types),
@@ -399,7 +399,7 @@ col_types <- list(
   withdrawn = col_double()
 )
 
-patent_tbl <- vroom(
+patent_tbl2 <- vroom(
   file       = "data-science/DS_101/00_data/patent.tsv",
   delim      = "\t",
   col_names  = names(col_types),
@@ -409,25 +409,25 @@ patent_tbl <- vroom(
 
 
 
-assignee_select_tbl <- assignee_tbl %>%
+assignee_select_tbl2 <- assignee_tbl2 %>%
   select(id, type, organization) %>%
   rename(
     assignee_id = id
   )
 
-patent_assignee_select_tbl <- patent_assignee_tbl %>%
+patent_assignee_select_tbl2 <- patent_assignee_tbl2 %>%
   select(patent_id,assignee_id)
 
-patent_select_tbl <- patent_tbl %>%
+patent_select_tbl2 <- patent_tbl2 %>%
   select(number, date) %>%
   rename(
     patent_id = number
   )
 
 
-patent_assignee_joined_tbl <- assignee_select_tbl %>%
-  left_join(y = patent_assignee_select_tbl, by = c("assignee_id" = "assignee_id")) %>%
-  left_join(y = patent_select_tbl, by = c("patent_id" = "patent_id")) %>%
+patent_assignee_joined_tbl2 <- assignee_select_tbl2 %>%
+  left_join(y = patent_assignee_select_tbl2, by = c("assignee_id" = "assignee_id")) %>%
+  left_join(y = patent_select_tbl2, by = c("patent_id" = "patent_id")) %>%
   select(type,date,organization,patent_id) %>%
   filter(type == 2) %>%
   separate(col  = date,
@@ -445,20 +445,20 @@ patent_assignee_joined_tbl <- assignee_select_tbl %>%
   arrange(desc(count)) %>%
   slice(1:10)
 
-patent_assignee_joined_tbl
+patent_assignee_joined_tbl2
 
 ```
 
-```{r result}
+```{r2 result2}
 library(readr)
 library(data.table)
-result <- read_rds("assignment3-2.rds")
-result
+result2 <- read_rds("assignment3-2.rds")
+result2
 ```
 
 
 ## Challenge 3.3
-```{r caluclation, eval=FALSE}
+```{r3 caluclation3, eval=FALSE}
 
 library(tidyverse)
 library(vroom)
@@ -475,7 +475,7 @@ col_types <- list(
   organization = col_character()
 )
 
-assignee_tbl <- vroom(
+assignee_tbl3 <- vroom(
   file       = "data-science/DS_101/00_data/assignee.tsv",
   delim      = "\t",
   col_names  = names(col_types),
@@ -489,7 +489,7 @@ col_types <- list(
   location_id = col_character()
 )
 
-patent_assignee_tbl <- vroom(
+patent_assignee_tbl3 <- vroom(
   file       = "data-science/DS_101/00_data/patent_assignee.tsv",
   delim      = "\t",
   col_names  = names(col_types),
@@ -506,7 +506,7 @@ col_types <- list(
   sequence = col_double()
 )
 
-uspc_tbl <- vroom(
+uspc_tbl3 <- vroom(
   file       = "data-science/DS_101/00_data/uspc.tsv",
   delim      = "\t",
   col_names  = names(col_types),
@@ -515,22 +515,22 @@ uspc_tbl <- vroom(
 )
 
 
-assignee_select_tbl <- assignee_tbl %>%
+assignee_select_tbl3 <- assignee_tbl3 %>%
   select(id, type, organization) %>%
   rename(
     assignee_id = id
   )
 
-patent_assignee_select_tbl <- patent_assignee_tbl %>%
+patent_assignee_select_tbl3 <- patent_assignee_tbl3 %>%
   select(patent_id,assignee_id)
 
 
-uspc_select_tbl <- uspc_tbl %>%
+uspc_select_tbl3 <- uspc_tbl3 %>%
   select(patent_id, mainclass_id) 
 
 
-patent_assignee_joined_tbl <- assignee_select_tbl %>%
-  left_join(y = patent_assignee_select_tbl, by = c("assignee_id" = "assignee_id")) %>%
+patent_assignee_joined_tbl3 <- assignee_select_tbl3 %>%
+  left_join(y = patent_assignee_select_tbl3, by = c("assignee_id" = "assignee_id")) %>%
   select(type,organization,patent_id) %>%
   group_by(organization) %>%
   summarise(
@@ -539,12 +539,12 @@ patent_assignee_joined_tbl <- assignee_select_tbl %>%
   ungroup() %>%
   arrange(desc(count)) %>%
   slice(1:10)
-patent_assignee_joined_tbl
+patent_assignee_joined_tbl3
 # get the list of top10 result and put to filter below
 
-top_mainclass_tbl <- assignee_select_tbl %>%
-  left_join(y = patent_assignee_select_tbl, by = c("assignee_id" = "assignee_id")) %>%
-  left_join(y = uspc_select_tbl, by = c("patent_id" = "patent_id")) %>%
+top_mainclass_tbl3 <- assignee_select_tbl3 %>%
+  left_join(y = patent_assignee_select_tbl3, by = c("assignee_id" = "assignee_id")) %>%
+  left_join(y = uspc_select_tbl3, by = c("patent_id" = "patent_id")) %>%
   select(organization,mainclass_id) %>%
   filter(organization %in% c("International Business Machines Corporation", "Canon Kabushiki Kaisha","Samsung Electronics Co., Ltd.","General Electric Company","Kabushiki Kaisha Toshiba","Sony Corporation","Hitachi, Ltd.","Intel Corporation","Fujitsu Limited","NEC Corporation")) %>%
   group_by(mainclass_id) %>%
@@ -555,15 +555,15 @@ top_mainclass_tbl <- assignee_select_tbl %>%
   ungroup() %>%
   slice(1:6) #row 1 is NA
 
-top_mainclass_tbl
+top_mainclass_tbl3
 
 ```
 
-```{r result}
+```{r3 result3}
 library(readr)
 library(data.table)
-result <- read_rds("assignment3-3.rds")
-result
+result3 <- read_rds("assignment3-3.rds")
+result3
 ```
 # Challenge 4
 
