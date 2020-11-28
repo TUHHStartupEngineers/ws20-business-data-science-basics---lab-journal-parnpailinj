@@ -1,49 +1,42 @@
 library(tidyverse) 
 library(lubridate)
 library(ggplot2)
+library(maps)
 
 covid_data_tbl <- read_csv("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
   
   
 covid_trend_tbl <- covid_data_tbl %>%
-  select(1, contains("countries"),contains("continent"),contains("COVID")) %>% 
-  set_names(c("date", "country", "continent", "cumulative_case")) %>% 
-  mutate(cumulative_case = 100000*cumulative_case)  %>% 
-  filter(country %in% c("Germany", "Spain",))
+  mutate(across(countriesAndTerritories, str_replace_all, "_", " ")) %>%
+  mutate(countriesAndTerritories = case_when(
+    countriesAndTerritories == "United Kingdom" ~ "UK",
+    countriesAndTerritories == "United States of America" ~ "USA",
+    countriesAndTerritories == "Czechia" ~ "Czech Republic",
+    TRUE ~ countriesAndTerritories
+  ))
 
+deathrate_tbl <- covid_trend_tbl %>%  
+  select(1,contains("countries"),6,10) %>% 
+  set_names(c("date","countries","deaths","population")) %>% 
+  mutate(date = as.Date(date, "%d/%m/%Y")) %>%
+  arrange(date) %>%
+  slice(1:52963) %>%
+  group_by(countries) %>%
+  mutate(deathrate = cumsum(deaths/population)) %>%
+  summarize(Mortality_Rate  = max(deathrate)*100)%>%
+  ungroup()  
 
+world <- map_data("world") %>%
+  rename(countries= region)
 
+covid_map <- left_join(world, deathrate_tbl, by = "countries")
 
-
-x <- 1:10
-y1 <- 1:10
-y2 <- 2:11
-y3 <- 3:12
-y4 <- 4:13
-y5 <- 5:14
-y6 <- 6:15
-df <- data.frame(x, y1, y2, y3, y4, y5, y6)
-ggplot(df, aes(x)) +
-  geom_line(aes(y=y1),
-            colour="red") +
-  geom_line(aes(y=y2),
-            colour="green") +
-  geom_line(aes(y=y3),
-            colour="blue") +
-  geom_line(aes(y=y4),
-            colour="yellow") +
-  geom_line(aes(y=y5),
-            colour="orange") +
-  geom_line(aes(y=y6),
-            colour="black")+
-  scale_y_continuous(labels = scales::dollar_format(scale = 1e-6, 
-                                                    prefix = "",
-                                                    suffix = "M ")) +
-  theme_dark() +
+ggplot(covid_map,aes(long,lat,group =group)) +
+  geom_polygon(aes(fill = Mortality_Rate), color = "white")+
+  scale_fill_gradient(low="#FF3333", high="#330000")+
   labs(
-    title    = "COVID-19 confirmed cases worldwide",
-    subtitle = "as of 11/02/2020,Europe had more cases than the USA",
-    x = "Year2020", # Override defaults for x and y
-    y = "Cumulative Cases"
-  ) 
-
+    title    = "Confirmed COVID-19 deaths relative to the size of the population",
+    subtitle = "More than 1.2 Million confirmed COVID-19 deaths worldwide",
+    x = "Date: 11/02/2020", # Override defaults for x and y
+    y = ""
+  )

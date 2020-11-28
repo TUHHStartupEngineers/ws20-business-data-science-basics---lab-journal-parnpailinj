@@ -424,7 +424,7 @@ div.tocify {
 
 <div id="challenge-1" class="section level1">
 <h1><span class="header-section-number">1</span> Challenge 1</h1>
-<p>Last compiled: 2020-11-27</p>
+<p>Last compiled: 2020-11-28</p>
 <div id="chalenge-1.1" class="section level2">
 <h2><span class="header-section-number">1.1</span> Chalenge 1.1</h2>
 <pre class="r"><code># 1.0 Load libraries ----
@@ -797,8 +797,7 @@ result1</code></pre>
 </div>
 <div id="challenge-3.2" class="section level2">
 <h2><span class="header-section-number">3.2</span> Challenge 3.2</h2>
-<pre class="r2"><code>
-library(tidyverse)
+<pre class="r"><code>library(tidyverse)
 library(vroom)
 library(tidyverse)
 library(readxl)
@@ -895,17 +894,28 @@ patent_assignee_joined_tbl2 &lt;- assignee_select_tbl2 %&gt;%
   arrange(desc(count)) %&gt;%
   slice(1:10)
 
-patent_assignee_joined_tbl2
-</code></pre>
-<pre class="r2"><code>library(readr)
+patent_assignee_joined_tbl2</code></pre>
+<pre class="r"><code>library(readr)
 library(data.table)
 result2 &lt;- read_rds(&quot;assignment3-2.rds&quot;)
 result2</code></pre>
+<pre><code>## # A tibble: 10 x 2
+##    organization                                count
+##    &lt;chr&gt;                                       &lt;int&gt;
+##  1 International Business Machines Corporation  6016
+##  2 INTERNATIONAL BUSINESS MACHINES CORPORATION  3174
+##  3 Intel Corporation                            2497
+##  4 Microsoft Technology Licensing, LLC          2414
+##  5 Apple Inc.                                   2339
+##  6 Amazon Technologies, Inc.                    2258
+##  7 QUALCOMM Incorporated                        2125
+##  8 Ford Global Technologies, LLC                1931
+##  9 Google LLC                                   1581
+## 10 General Electric Company                     1452</code></pre>
 </div>
 <div id="challenge-3.3" class="section level2">
 <h2><span class="header-section-number">3.3</span> Challenge 3.3</h2>
-<pre class="r3"><code>
-library(tidyverse)
+<pre class="r"><code>library(tidyverse)
 library(vroom)
 library(tidyverse)
 library(readxl)
@@ -1000,16 +1010,129 @@ top_mainclass_tbl3 &lt;- assignee_select_tbl3 %&gt;%
   ungroup() %&gt;%
   slice(1:6) #row 1 is NA
 
-top_mainclass_tbl3
-</code></pre>
-<pre class="r3"><code>library(readr)
+top_mainclass_tbl3</code></pre>
+<pre class="r"><code>library(readr)
 library(data.table)
 result3 &lt;- read_rds(&quot;assignment3-3.rds&quot;)
 result3</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   mainclass_id  count
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 &lt;NA&gt;         200038
+## 2 257           96684
+## 3 438           55627
+## 4 365           42932
+## 5 370           39738
+## 6 455           37238</code></pre>
 </div>
 </div>
 <div id="challenge-4" class="section level1">
 <h1><span class="header-section-number">4</span> Challenge 4</h1>
+</div>
+<div id="challenge-4.1" class="section level1">
+<h1><span class="header-section-number">5</span> Challenge 4.1</h1>
+<pre class="r"><code>library(tidyverse) 
+library(lubridate)
+library(ggplot2)
+library(ggrepel)
+
+covid_data_tbl &lt;- read_csv(&quot;https://opendata.ecdc.europa.eu/covid19/casedistribution/csv&quot;)
+
+
+covid_trend_tbl &lt;- covid_data_tbl %&gt;%
+  select(1,contains(&quot;countries&quot;),5) %&gt;% 
+  set_names(c(&quot;date&quot;,&quot;country&quot;,&quot;cases&quot;)) %&gt;% 
+  mutate(date = as.Date(date, &quot;%d/%m/%Y&quot;)) %&gt;%
+  arrange(date) %&gt;%
+  filter(country %in% c(&quot;Germany&quot;, &quot;Spain&quot;,&quot;France&quot;,&quot;United_Kingdom&quot;,&quot;United_States_of_America&quot;)) %&gt;%
+  group_by(country) %&gt;%
+  mutate(cum_cases = cumsum(cases)) %&gt;%
+  ungroup()  %&gt;% 
+  slice(1:1540)
+
+xxx = toString(covid_trend_tbl[1540,4])
+
+USA_tbl &lt;- covid_data_tbl %&gt;%
+  select(1,contains(&quot;countries&quot;),5) %&gt;% 
+  set_names(c(&quot;date&quot;,&quot;country&quot;,&quot;cases&quot;)) %&gt;% 
+  mutate(date = as.Date(date, &quot;%d/%m/%Y&quot;)) %&gt;%
+  arrange(date) %&gt;%
+  filter(country %in% c(&quot;United_States_of_America&quot;)) %&gt;%
+  group_by(country) %&gt;%
+  mutate(cum_cases = cumsum(cases)) %&gt;%
+  ungroup() %&gt;%
+  slice(308) 
+
+
+covid_trend_tbl %&gt;%
+  mutate(label2 = if_else(date == max(date) &amp; country == &quot;United_States_of_America&quot; , as.character(cum_cases), NA_character_)) %&gt;%
+  ggplot(aes(x = date, y = cum_cases, color = country)) +
+  geom_line(size = 0.5, linetype = 1) +
+  geom_label(aes(label = label2), 
+             hjust = &quot;inward&quot;,
+             size  = 3,
+             color = RColorBrewer::brewer.pal(n = 11, name = &quot;RdBu&quot;)[11]) +
+  
+  scale_x_date(date_breaks = &quot;1 month&quot;, date_labels = &quot;%b&quot;)+
+  scale_y_continuous(limits=c(0, 10000000),labels = scales::dollar_format(scale = 1e-6, 
+                                                                          prefix = &quot;&quot;,
+                                                                          suffix = &quot;M &quot;)) +
+  theme_dark() +
+  scale_color_manual(breaks = c(&quot;Germany&quot;, &quot;Spain&quot;,&quot;France&quot;,&quot;United_Kingdom&quot;,&quot;United_States_of_America&quot;),
+                     values=c(&quot;black&quot;, &quot;blue&quot;, &quot;green&quot;,&quot;yellow&quot;,&quot;red&quot;)) +
+  labs(
+    title    = &quot;COVID-19 confirmed cases worldwide&quot;,
+    subtitle = &quot;as of 11/02/2020,Europe had more cases than the USA&quot;,
+    x = &quot;Year2020&quot;, # Override defaults for x and y
+    y = &quot;Cumulative Cases&quot;
+  )</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
+</div>
+<div id="challenge-4.2" class="section level1">
+<h1><span class="header-section-number">6</span> Challenge 4.2</h1>
+<pre class="r"><code>library(tidyverse) 
+library(lubridate)
+library(ggplot2)
+library(maps)
+
+covid_data_tbl &lt;- read_csv(&quot;https://opendata.ecdc.europa.eu/covid19/casedistribution/csv&quot;)
+  
+  
+covid_trend_tbl &lt;- covid_data_tbl %&gt;%
+  mutate(across(countriesAndTerritories, str_replace_all, &quot;_&quot;, &quot; &quot;)) %&gt;%
+  mutate(countriesAndTerritories = case_when(
+    countriesAndTerritories == &quot;United Kingdom&quot; ~ &quot;UK&quot;,
+    countriesAndTerritories == &quot;United States of America&quot; ~ &quot;USA&quot;,
+    countriesAndTerritories == &quot;Czechia&quot; ~ &quot;Czech Republic&quot;,
+    TRUE ~ countriesAndTerritories
+  ))
+
+deathrate_tbl &lt;- covid_trend_tbl %&gt;%  
+  select(1,contains(&quot;countries&quot;),6,10) %&gt;% 
+  set_names(c(&quot;date&quot;,&quot;countries&quot;,&quot;deaths&quot;,&quot;population&quot;)) %&gt;% 
+  mutate(date = as.Date(date, &quot;%d/%m/%Y&quot;)) %&gt;%
+  arrange(date) %&gt;%
+  slice(1:52963) %&gt;%
+  group_by(countries) %&gt;%
+  mutate(deathrate = cumsum(deaths/population)) %&gt;%
+  summarize(Mortality_Rate  = max(deathrate)*100)%&gt;%
+  ungroup()  
+
+world &lt;- map_data(&quot;world&quot;) %&gt;%
+  rename(countries= region)
+
+covid_map &lt;- left_join(world, deathrate_tbl, by = &quot;countries&quot;)
+
+ggplot(covid_map,aes(long,lat,group =group)) +
+  geom_polygon(aes(fill = Mortality_Rate), color = &quot;white&quot;)+
+  scale_fill_gradient(low=&quot;#FF3333&quot;, high=&quot;#330000&quot;)+
+  labs(
+    title    = &quot;Confirmed COVID-19 deaths relative to the size of the population&quot;,
+    subtitle = &quot;More than 1.2 Million confirmed COVID-19 deaths worldwide&quot;,
+    x = &quot;Date: 11/02/2020&quot;, # Override defaults for x and y
+    y = &quot;&quot;
+  )</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
 </div>
 
 
